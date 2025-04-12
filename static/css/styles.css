@@ -1,0 +1,104 @@
+/* General Styles */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+.footer {
+    margin-top: auto;
+}
+
+/* Recipe Cards */
+.recipe-image {
+    height: 200px;
+    object-fit: cover;
+}
+
+/* Voice and Gesture Controls */
+.voice-control-container,
+.gesture-control-container {
+    display: flex;
+    align-items: center;
+}
+
+.voice-status,
+.gesture-status {
+    margin-left: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--bs-secondary);
+}
+
+#voiceControlBtn.active,
+#gestureControlBtn.active {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+/* Video Container for Gesture Recognition */
+#video-container {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    z-index: 100;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+#webcam, #gesture-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* Recipe Detail Page */
+.recipe-detail .step {
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.recipe-detail .active-step {
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    border-left: 3px solid var(--bs-primary);
+}
+
+.step-number {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: var(--bs-primary);
+}
+
+.ingredients-list li {
+    padding: 0.5rem 0.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .recipe-meta {
+        flex-direction: column;
+    }
+    
+    .recipe-meta > div {
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Toast styling */
+#feedback-toast {
+    z-index: 1100;
+}
+
+/* Gesture guide */
+#gesture-guide {
+    z-index: 1050;
+    max-width: 250px;
+}

@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1 class="display-5 fw-bold">Hands-Free Cooking Experience</h1>
+        <p class="lead">Browse recipes, control navigation with voice commands or gestures, and enjoy a seamless cooking experience without touching your device.</p>
+    </div>
+    <div class="col-md-4 d-flex align-items-center justify-content-end">
+        <div class="card bg-light text-dark p-3 shadow-sm">
+            <h5><i class="fas fa-microphone me-2"></i>Voice Commands</h5>
+            <ul class="small list-unstyled mb-0">
+                <li>"Show recipe for [food]"</li>
+                <li>"Show all [category] recipes"</li>
+                <li>"Go back to home"</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-6 mb-3">
+        <div class="input-group">
+            <input type="text" id="searchInput" class="form-control" placeholder="Search for recipes...">
+            <button class="btn btn-primary" type="button" id="searchButton">
+                <i class="fas fa-search"></i> Search
+            </button>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <select id="categoryFilter" class="form-select">
+            <option value="">All Categories</option>
+            {% for category in categories %}
+            <option value="{{ category }}">{{ category }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+
+<div id="recipe-container" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for recipe in recipes %}
+    <div class="col recipe-card" data-categories="{{ recipe.categories|join(',') }}">
+        <div class="card h-100 shadow-sm">
+            <img src="{{ recipe.image_url }}" class="card-img-top recipe-image" alt="{{ recipe.title }}">
+            <div class="card-body">
+                <h5 class="card-title">{{ recipe.title }}</h5>
+                <p class="card-text">{{ recipe.description }}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        <i class="far fa-clock me-1"></i>{{ recipe.prep_time + recipe.cook_time }} min
+                    </small>
+                    <div class="btn-group">
+                        <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}" class="btn btn-sm btn-outline-primary">View Recipe</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <small class="text-muted">
+                    Categories:
+                    {% for category in recipe.categories %}
+                    <span class="badge bg-secondary me-1">{{ category }}</span>
+                    {% endfor %}
+                </small>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div id="no-results" class="alert alert-info mt-4 d-none">
+    No recipes found matching your search.
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const recipeCards = document.querySelectorAll('.recipe-card');
+        const noResults = document.getElementById('no-results');
+
+        function filterRecipes() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const category = categoryFilter.value.toLowerCase();
+            let visibleCount = 0;
+
+            recipeCards.forEach(card => {
+                const title = card.querySelector('.card-title').textContent.toLowerCase();
+                const description = card.querySelector('.card-text').textContent.toLowerCase();
+                const categories = card.dataset.categories.toLowerCase();
+                
+                const matchesSearch = !searchTerm || title.includes(searchTerm) || description.includes(searchTerm);
+                const matchesCategory = !category || categories.includes(category);
+
+                if (matchesSearch && matchesCategory) {
+                    card.classList.remove('d-none');
+                    visibleCount++;
+                } else {
+                    card.classList.add('d-none');
+                }
+            });
+
+            if (visibleCount === 0) {
+                noResults.classList.remove('d-none');
+            } else {
+                noResults.classList.add('d-none');
+            }
+        }
+
+        searchButton.addEventListener('click', filterRecipes);
+        searchInput.addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                filterRecipes();
+            }
+        });
+        categoryFilter.addEventListener('change', filterRecipes);
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="recipe-detail">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ recipe.title }}</li>
+                </ol>
+            </nav>
+        </div>
+        
+        <div class="col-md-6">
+            <img src="{{ recipe.image_url }}" class="img-fluid rounded mb-3" alt="{{ recipe.title }}">
+        </div>
+        
+        <div class="col-md-6">
+            <h1 class="mb-3">{{ recipe.title }}</h1>
+            <p class="lead">{{ recipe.description }}</p>
+            
+            <div class="recipe-meta mb-4">
+                <div class="d-flex flex-wrap">
+                    <div class="me-4 mb-2">
+                        <i class="far fa-clock me-1"></i> Prep Time: {{ recipe.prep_time }} min
+                    </div>
+                    <div class="me-4 mb-2">
+                        <i class="fas fa-fire me-1"></i> Cook Time: {{ recipe.cook_time }} min
+                    </div>
+                    <div class="mb-2">
+                        <i class="fas fa-utensils me-1"></i> Servings: {{ recipe.servings }}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <h6>Categories:</h6>
+                <div>
+                    {% for category in recipe.categories %}
+                    <span class="badge bg-secondary me-1">{{ category }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Ingredients</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush ingredients-list">
+                        {% for ingredient in recipe.ingredients %}
+                        <li class="list-group-item bg-transparent">{{ ingredient }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4>Instructions</h4>
+                    <div class="instruction-controls">
+                        <button id="readInstructionsBtn" class="btn btn-sm btn-primary">
+                            <i class="fas fa-play me-1"></i> Read Instructions
+                        </button>
+                        <button id="pauseInstructionsBtn" class="btn btn-sm btn-secondary d-none">
+                            <i class="fas fa-pause me-1"></i> Pause
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="steps-container">
+                        {% for instruction in recipe.instructions %}
+                        <div class="step mb-3" data-step="{{ loop.index }}">
+                            <h5 class="step-number">Step {{ loop.index }}</h5>
+                            <p class="step-text">{{ instruction }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="step-navigation mt-4 d-flex justify-content-between">
+                        <button id="prevStepBtn" class="btn btn-outline-secondary" disabled>
+                            <i class="fas fa-chevron-left me-1"></i> Previous Step
+                        </button>
+                        <div>
+                            <span id="currentStepIndicator">Step 1 of {{ recipe.instructions|length }}</span>
+                        </div>
+                        <button id="nextStepBtn" class="btn btn-outline-primary">
+                            Next Step <i class="fas fa-chevron-right ms-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card bg-light text-dark">
+                <div class="card-body">
+                    <h5><i class="fas fa-microphone me-2"></i>Recipe Voice Commands</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="mb-0">
+                                <li>"read recipe" - Start reading the recipe instructions</li>
+                                <li>"pause reading" - Pause the reading</li>
+                                <li>"continue reading" - Continue reading from where you left off</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="mb-0">
+                                <li>"next step" - Go to the next instruction step</li>
+                                <li>"previous step" - Go to the previous instruction step</li>
+                                <li>"repeat step" - Repeat the current instruction step</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="gesture-guide" class="position-fixed bottom-0 end-0 p-3 d-none">
+    <div class="card bg-dark text-light">
+        <div class="card-body">
+            <h5 class="card-title">Gesture Guide</h5>
+            <p class="card-text small">
+                <strong>Swipe Right</strong>: Next Step<br>
+                <strong>Swipe Left</strong>: Previous Step<br>
+                <strong>Open Hand</strong>: Start/Continue Reading<br>
+                <strong>Closed Fist</strong>: Pause Reading
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Variables to track the current state
+        const totalSteps = {{ recipe.instructions|length }};
+        let currentStep = 1;
+        let isReading = false;
+        let utterance = null;
+        let synth = window.speechSynthesis;
+        
+        // DOM elements
+        const stepElements = document.querySelectorAll('.step');
+        const prevStepBtn = document.getElementById('prevStepBtn');
+        const nextStepBtn = document.getElementById('nextStepBtn');
+        const currentStepIndicator = document.getElementById('currentStepIndicator');
+        const readInstructionsBtn = document.getElementById('readInstructionsBtn');
+        const pauseInstructionsBtn = document.getElementById('pauseInstructionsBtn');
+        
+        // Initialize highlighting for the first step
+        highlightCurrentStep();
+        
+        // Next step button handler
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                updateStepControls();
+                highlightCurrentStep();
+                
+                // If we're currently reading, start reading the new step
+                if (isReading) {
+                    readCurrentStep();
+                }
+            }
+        });
+        
+        // Previous step button handler
+        prevStepBtn.addEventListener('click', () => {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStepControls();
+                highlightCurrentStep();
+                
+                // If we're currently reading, start reading the new step
+                if (isReading) {
+                    readCurrentStep();
+                }
+            }
+        });
+        
+        // Start reading instructions
+        readInstructionsBtn.addEventListener('click', () => {
+            isReading = true;
+            readInstructionsBtn.classList.add('d-none');
+            pauseInstructionsBtn.classList.remove('d-none');
+            readCurrentStep();
+        });
+        
+        // Pause reading instructions
+        pauseInstructionsBtn.addEventListener('click', () => {
+            isReading = false;
+            readInstructionsBtn.classList.remove('d-none');
+            pauseInstructionsBtn.classList.add('d-none');
+            
+            if (synth.speaking) {
+                synth.cancel();
+            }
+        });
+        
+        // Function to update the step navigation buttons
+        function updateStepControls() {
+            prevStepBtn.disabled = (currentStep === 1);
+            nextStepBtn.disabled = (currentStep === totalSteps);
+            currentStepIndicator.textContent = `Step ${currentStep} of ${totalSteps}`;
+        }
+        
+        // Function to highlight the current step
+        function highlightCurrentStep() {
+            stepElements.forEach(step => {
+                step.classList.remove('active-step');
+            });
+            
+            const activeStep = document.querySelector(`.step[data-step="${currentStep}"]`);
+            if (activeStep) {
+                activeStep.classList.add('active-step');
+                
+                // Scroll to the active step
+                activeStep.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+        
+        // Function to read the current step
+        function readCurrentStep() {
+            if (synth.speaking) {
+                synth.cancel();
+            }
+            
+            const stepText = document.querySelector(`.step[data-step="${currentStep}"] .step-text`).textContent;
+            utterance = new SpeechSynthesisUtterance(`Step ${currentStep}: ${stepText}`);
+            
+            utterance.onend = function() {
+                // If we've reached the end and we're still in reading mode, go to the next step
+                if (isReading && currentStep < totalSteps) {
+                    setTimeout(() => {
+                        currentStep++;
+                        updateStepControls();
+                        highlightCurrentStep();
+                        readCurrentStep();
+                    }, 1000); // Pause between steps
+                } else if (isReading && currentStep === totalSteps) {
+                    // We've finished all steps
+                    isReading = false;
+                    readInstructionsBtn.classList.remove('d-none');
+                    pauseInstructionsBtn.classList.add('d-none');
+                }
+            };
+            
+            synth.speak(utterance);
+        }
+        
+        // Initialize with current recipe data for voice control
+        window.currentRecipeId = {{ recipe_id }};
+        window.recipeTitle = "{{ recipe.title }}";
+        window.recipeInstructions = [
+            {% for instruction in recipe.instructions %}
+                "{{ instruction|replace('"', '\\"') }}",
+            {% endfor %}
+        ];
+        
+        // Show gesture guide when gesture control is active
+        document.getElementById('gestureControlBtn').addEventListener('click', function() {
+            const gestureGuide = document.getElementById('gesture-guide');
+            if (this.classList.contains('active')) {
+                gestureGuide.classList.remove('d-none');
+            } else {
+                gestureGuide.classList.add('d-none');
+            }
+        });
+    });
+</script>
+{% endblock %}
