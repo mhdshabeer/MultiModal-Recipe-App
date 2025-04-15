@@ -111,26 +111,60 @@ document.addEventListener('DOMContentLoaded', function() {
                 lastX = null;
             }, 1000);
         } else if (!isTracking) {
-            // Calculate finger distances from palm
-            const fingerDistances = [
-                Math.abs(thumbTip.y - palmBase.y),
-                Math.abs(indexTip.y - palmBase.y),
-                Math.abs(middleTip.y - palmBase.y),
-                Math.abs(ringTip.y - palmBase.y),
-                Math.abs(pinkyTip.y - palmBase.y)
+            // Calculate finger bend angles
+            const wrist = landmarks[0];
+            const fingerBends = [
+                {base: landmarks[5], mid: landmarks[6], tip: landmarks[8]},    // index
+                {base: landmarks[9], mid: landmarks[10], tip: landmarks[12]},  // middle
+                {base: landmarks[13], mid: landmarks[14], tip: landmarks[16]}, // ring
+                {base: landmarks[17], mid: landmarks[18], tip: landmarks[20]}  // pinky
             ];
             
-            // Average distance of fingers from palm
-            const avgDistance = fingerDistances.reduce((a, b) => a + b) / 5;
+            // Check if fingers are closed (bent)
+            const areFingersClosed = fingerBends.every(finger => {
+                const bendAngle = calculateBendAngle(finger.base, finger.mid, finger.tip);
+                return bendAngle > 90; // Angle greater than 90 degrees means finger is bent
+            });
             
-            if (avgDistance > 0.15) {
-                triggerGestureAction('open-hand');
-                isTracking = true;
-                setTimeout(() => isTracking = false, 1000);
-            } else if (avgDistance < 0.08) {
+            if (areFingersClosed) {
                 triggerGestureAction('closed-fist');
                 isTracking = true;
                 setTimeout(() => isTracking = false, 1000);
+            } else {
+                // Calculate average finger distance for open hand detection
+                const fingerDistances = [
+                    Math.abs(thumbTip.y - palmBase.y),
+                    Math.abs(indexTip.y - palmBase.y),
+                    Math.abs(middleTip.y - palmBase.y),
+                    Math.abs(ringTip.y - palmBase.y),
+                    Math.abs(pinkyTip.y - palmBase.y)
+                ];
+                const avgDistance = fingerDistances.reduce((a, b) => a + b) / 5;
+                
+                if (avgDistance > 0.15) {
+                    triggerGestureAction('open-hand');
+                    isTracking = true;
+                    setTimeout(() => isTracking = false, 1000);
+                }
+            }
+            
+            // Helper function to calculate angle between three points
+            function calculateBendAngle(base, mid, tip) {
+                const vector1 = {
+                    x: mid.x - base.x,
+                    y: mid.y - base.y
+                };
+                const vector2 = {
+                    x: tip.x - mid.x,
+                    y: tip.y - mid.y
+                };
+                
+                const dot = vector1.x * vector2.x + vector1.y * vector2.y;
+                const mag1 = Math.sqrt(vector1.x * vector1.x + vector1.y * vector1.y);
+                const mag2 = Math.sqrt(vector2.x * vector2.x + vector2.y * vector2.y);
+                
+                const angle = Math.acos(dot / (mag1 * mag2)) * (180 / Math.PI);
+                return angle;
             }
         }
     }
