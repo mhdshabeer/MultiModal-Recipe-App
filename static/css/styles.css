@@ -1,28 +1,28 @@
 /* Theme Variables */
 :root[data-theme="light"] {
     --bg-color: #ffffff;
-    --text-color: #2d1b36;
+    --text-color: #9370DB;
     --card-bg: #ffffff;
-    --border-color: #e6d5f2;
-    --primary-color: #8a2be2;
-    --hover-color: #faf5ff;
-    --accent-color: #ff6b6b;
-    --secondary-text: #666666;
-    --card-text: #333333;
-    --nav-text: #4a2e5d;
+    --border-color: #E6E6FA;
+    --primary-color: #9370DB;
+    --hover-color: #F8F4FF;
+    --accent-color: #B19CD9;
+    --secondary-text: #9370DB;
+    --card-text: #9370DB;
+    --nav-text: #9370DB;
 }
 
 :root[data-theme="dark"] {
     --bg-color: #1a0f23;
-    --text-color: #ffffff;
+    --text-color: #E6E6FA;
     --card-bg: #2d1b36;
-    --border-color: #4a2e5d;
-    --primary-color: #b164f2;
+    --border-color: #9370DB;
+    --primary-color: #B19CD9;
     --hover-color: #3d2647;
-    --accent-color: #ff8585;
-    --secondary-text: #cccccc;
-    --card-text: #ffffff;
-    --nav-text: #ffffff;
+    --accent-color: #E6E6FA;
+    --secondary-text: #E6E6FA;
+    --card-text: #E6E6FA;
+    --nav-text: #E6E6FA;
 }
 
 /* Update text colors */
