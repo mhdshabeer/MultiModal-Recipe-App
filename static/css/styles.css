@@ -7,6 +7,9 @@
     --primary-color: #8a2be2;
     --hover-color: #faf5ff;
     --accent-color: #ff6b6b;
+    --secondary-text: #666666;
+    --card-text: #333333;
+    --nav-text: #4a2e5d;
 }
 
 :root[data-theme="dark"] {
@@ -17,6 +20,27 @@
     --primary-color: #b164f2;
     --hover-color: #3d2647;
     --accent-color: #ff8585;
+    --secondary-text: #cccccc;
+    --card-text: #ffffff;
+    --nav-text: #ffffff;
+}
+
+/* Update text colors */
+.card {
+    color: var(--card-text);
+}
+
+.nav-link {
+    color: var(--nav-text) !important;
+}
+
+.voice-status, 
+.gesture-status {
+    color: var(--secondary-text) !important;
+}
+
+.step-number {
+    color: var(--primary-color) !important;
 }
 
 /* General Styles */
