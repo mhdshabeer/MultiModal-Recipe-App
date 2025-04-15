@@ -1,5 +1,29 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Recipe App Initialized');
+    
+    // Theme toggle functionality
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const icon = themeToggleBtn.querySelector('i');
+    
+    // Check for saved theme preference or default to dark
+    const currentTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    updateThemeIcon(currentTheme);
+    
+    themeToggleBtn.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcon(newTheme);
+    });
+    
+    function updateThemeIcon(theme) {
+        const icon = themeToggleBtn.querySelector('i');
+        icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        themeToggleBtn.className = `btn btn-outline-${theme === 'dark' ? 'light' : 'dark'} me-3`;
+    }
 
     // Helper function to get URL parameters
     function getUrlParameter(name) {
