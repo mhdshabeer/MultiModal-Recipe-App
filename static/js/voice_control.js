@@ -115,7 +115,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isHomePage) {
             // Search for a recipe by name
             if (command.includes('show recipe for') || command.includes('find recipe for')) {
-                const query = command.replace(/show recipe for|find recipe for/gi, '').trim();
+                const query = command
+                    .replace(/show recipe for|find recipe for/gi, '')
+                    .replace(/[.,!?]$/, '') // Remove punctuation at the end
+                    .trim();
                 if (query) {
                     document.getElementById('searchInput').value = query;
                     document.getElementById('searchButton').click();
