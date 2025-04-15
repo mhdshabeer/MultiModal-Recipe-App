@@ -102,22 +102,33 @@ document.addEventListener('DOMContentLoaded', function() {
         if (Math.abs(movement) > 0.15) {
             isTracking = true;
             if (movement > 0) {
-                triggerGestureAction('swipe-right');
-            } else {
                 triggerGestureAction('swipe-left');
+            } else {
+                triggerGestureAction('swipe-right');
             }
             setTimeout(() => {
                 isTracking = false;
                 lastX = null;
             }, 1000);
         } else if (!isTracking) {
-            // Detect open/closed hand
-            if (fingerExtension < -0.1) {
-                triggerGestureAction('closed-fist');
+            // Calculate finger distances from palm
+            const fingerDistances = [
+                Math.abs(thumbTip.y - palmBase.y),
+                Math.abs(indexTip.y - palmBase.y),
+                Math.abs(middleTip.y - palmBase.y),
+                Math.abs(ringTip.y - palmBase.y),
+                Math.abs(pinkyTip.y - palmBase.y)
+            ];
+            
+            // Average distance of fingers from palm
+            const avgDistance = fingerDistances.reduce((a, b) => a + b) / 5;
+            
+            if (avgDistance > 0.15) {
+                triggerGestureAction('open-hand');
                 isTracking = true;
                 setTimeout(() => isTracking = false, 1000);
-            } else if (fingerExtension > 0.15) {
-                triggerGestureAction('open-hand');
+            } else if (avgDistance < 0.08) {
+                triggerGestureAction('closed-fist');
                 isTracking = true;
                 setTimeout(() => isTracking = false, 1000);
             }
