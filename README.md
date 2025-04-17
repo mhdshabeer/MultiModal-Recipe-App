@@ -36,8 +36,8 @@ A multimodal recipe application with voice and gesture controls, built with Flas
 ## Setup
 
 1. Clone the repository
-2. Install the requirements: `pip install -r requirements.txt`
-3. Run the application: `gunicorn --bind 0.0.0.0:5000 main:app`
+2. Install the requirements: `pip install -r dependencies.txt`
+3. Run the main.py
 4. Open your browser and navigate to `http://localhost:5000`
 
 ## Browser Compatibility
