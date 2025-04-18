@@ -1,3 +1,7 @@
+Members:
+Mohammed Shabeer (21BCS6001)
+Akshay S (21BCS5849)
+
 # Hands-Free Recipe App
 
 A multimodal recipe application with voice and gesture controls, built with Flask backend and HTML/CSS/JS frontend. This app features 20 recipes with hands-free navigation to provide a seamless cooking experience.
@@ -43,3 +47,13 @@ A multimodal recipe application with voice and gesture controls, built with Flas
 ## Browser Compatibility
 
 This app works best in Chrome as it has the most complete implementation of the Web Speech API and MediaDevices API.
+
+## Snapshots:
+![image](https://github.com/user-attachments/assets/b8c4a6a4-fad9-48d5-8e27-fbec006ea6f4)
+
+![image](https://github.com/user-attachments/assets/4d6bd12d-be14-4f24-91b8-5b73a64207e2)
+
+![image](https://github.com/user-attachments/assets/ba88fc32-e9c8-4035-b03f-cbaada5bb507)
+
+
+
