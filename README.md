@@ -1,6 +1,8 @@
 Members:
-Mohammed Shabeer (21BCS6001)
-Akshay S (21BCS5849)
+
+-Mohammed Shabeer (21BCS6001)
+
+-Akshay S (21BCS5849)
 
 # Hands-Free Recipe App
 
